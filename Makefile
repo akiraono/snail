@@ -1,4 +1,4 @@
-DATABASE=SnailWords.db
+DATABASE=snailwords.db
 
 all:clean createdb schema load dump
 

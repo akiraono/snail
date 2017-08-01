@@ -1,0 +1,2 @@
+.separator ,
+.import words_noun.csv noun

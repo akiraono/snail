@@ -1,0 +1,69 @@
+create table noun (
+singular_nominative   text,
+singular_genitive     text,
+singular_dative       text,
+singular_accusative   text,
+singular_instrumental text,
+singular_locative     text,
+plural_nominative     text,
+plural_genitive       text,
+plural_dative         text,
+plural_accusative     text,
+plural_instrumental   text,
+plural_locative       text
+);
+
+create table adjective (
+masculine_nominative   text,
+masculine_genitive     text,
+masculine_dative       text,
+masculine_accusative   text,
+masculine_instrumental text,
+masculine_locative     text,
+feminine_nominative    text,
+feminine_genitive      text,
+feminine_dative        text,
+feminine_accusative    text,
+feminine_instrumental  text,
+feminine_locative      text,
+neuter_nominative      text,
+neuter_genitive        text,
+neuter_dative          text,
+neuter_accusative      text,
+neuter_instrumental    text,
+neuter_locative        text,
+plural_nominative      text,
+plural_genitive        text,
+plural_dative          text,
+plural_accusative      text,
+plural_instrumental    text,
+plural_locative        text,
+short_masculine        text,
+short_feminine         text,
+short_neuter           text,
+short_plural           text
+);
+
+create table preposition (
+preposition text
+);
+
+create table adverb (
+adverb text
+);
+
+create table verb (
+infinitive text,
+singular_first text,
+singular_second text,
+singular_third  text,
+plural_first text,
+plural_second text,
+plural_third text,
+past_masculine text,
+past_feminine text,
+past_neuter text,
+past_plural text,
+sigular_order text,
+plural_order text
+);
