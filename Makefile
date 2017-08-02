@@ -1,6 +1,7 @@
 DATABASE=snailwords.db
 
-all:clean createdb schema load dump
+#all:clean createdb schema load dump test
+all:test
 
 
 clean:
@@ -22,3 +23,5 @@ load:
 dump:
 	sqlite3 $(DATABASE) <select_words.sql3
 
+test:
+	./read_test.py $(DATABASE) text/rtmp019.txt
