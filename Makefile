@@ -1,7 +1,7 @@
 DATABASE=snailwords.db
 
-#all:clean createdb schema load dump test
-all:test
+all:clean createdb schema load dump test
+#all:test
 
 
 clean:

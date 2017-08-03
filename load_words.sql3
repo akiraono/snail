@@ -1,2 +1,7 @@
 .separator ,
 .import word/words_noun.csv noun
+.import word/words_prep.csv preposition
+.import word/words_adje.csv adjective
+.import word/words_verb.csv verb
+.import word/words_advb.csv adverb
+.import word/words_conj.csv conjunction

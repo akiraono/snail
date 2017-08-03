@@ -48,6 +48,10 @@ create table preposition (
 preposition text
 );
 
+create table conjunction (
+conjunction text
+);
+
 create table adverb (
 adverb text
 );
@@ -64,6 +68,6 @@ past_masculine text,
 past_feminine text,
 past_neuter text,
 past_plural text,
-sigular_order text,
+singular_order text,
 plural_order text
 );

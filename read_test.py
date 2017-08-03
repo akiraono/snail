@@ -61,17 +61,80 @@ class Word:
     def isDBRegistered(self,word):
         conn = sqlite3.connect(sys.argv[1])
         cursor = conn.cursor()
-        select_sql = 'select singular_nominative from noun where singular_nominative="' + word + '";'
+        if self.isDBRegisteredNoun(cursor,word):
+            conn.close()
+            return True
+        if self.isDBRegisteredVerb(cursor,word):
+            conn.close()
+            return True
+        if self.isDBRegisteredPrep(cursor,word):
+            conn.close()
+            return True
+        if self.isDBRegisteredConj(cursor,word):
+            conn.close()
+            return True
+        if self.isDBRegisteredAdvb(cursor,word):
+            conn.close()
+            return True
+        conn.close()
+        return False
+
+    def isDBRegisteredNoun(self,cursor,word):
+        select_sql = 'select * from {0} where {1}="{13}" or {2}="{13}" or {3}="{13}" or {4}="{13}" or {5}="{13}" or {6}="{13}" or {7}="{13}" or {8}="{13}" or {9}="{13}" or {10}="{13}" or {11}="{13}" or {12}="{13}";'.format('noun','singular_nominative','singular_genitive','singular_dative','singular_accusative','singular_instrumental','singular_locative','plural_nominative','plural_genitive','plural_dative','plural_accusative','plural_instrumental','plural_locative',word)
+        #print(select_sql)
         try:
             cursor.execute(select_sql)
             row = cursor.fetchone()
-            #print(row)
         except sqlite3.Error as er:
             print(er)
-        conn.close()
         if row is None:
             return False
         return True
+    def isDBRegisteredVerb(self,cursor,word):
+        select_sql = 'select * from {0} where {1}="{14}" or {2}="{14}" or {3}="{14}" or {4}="{14}" or {5}="{14}" or {6}="{14}" or {7}="{14}" or {8}="{14}" or {9}="{14}" or {10}="{14}" or {11}="{14}" or {12}="{14}" or {13}="${14}" ;'.format('verb','infinitive','singular_first','singular_second','singular_third','plural_first','plural_second','plural_third','past_masculine','past_feminine','past_neuter','past_plural','singular_order','plural_order',word)
+        #print(select_sql)
+        try:
+            cursor.execute(select_sql)
+            row = cursor.fetchone()
+        except sqlite3.Error as er:
+            print(er)
+        if row is None:
+            return False
+        return True
+    def isDBRegisteredPrep(self,cursor,word):
+        select_sql = 'select {0} from {1} where {0}="{2}";'.format('preposition','preposition',word)
+        #print(select_sql)
+        try:
+            cursor.execute(select_sql)
+            row = cursor.fetchone()
+        except sqlite3.Error as er:
+            print(er)
+        if row is None:
+            return False
+        return True
+    def isDBRegisteredConj(self,cursor,word):
+        select_sql = 'select {0} from {1} where {0}="{2}";'.format('conjunction','conjunction',word)
+        #print(select_sql)
+        try:
+            cursor.execute(select_sql)
+            row = cursor.fetchone()
+        except sqlite3.Error as er:
+            print(er)
+        if row is None:
+            return False
+        return True
+    def isDBRegisteredAdvb(self,cursor,word):
+        select_sql = 'select {0} from {1} where {0}="{2}";'.format('adverb','adverb',word)
+        #print(select_sql)
+        try:
+            cursor.execute(select_sql)
+            row = cursor.fetchone()
+        except sqlite3.Error as er:
+            print(er)
+        if row is None:
+            return False
+        return True
+
         
 
 class Sentence:
