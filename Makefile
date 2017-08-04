@@ -25,3 +25,4 @@ dump:
 
 test:
 	./read_test.py $(DATABASE) text/rtmp019.txt
+	./read_test.py $(DATABASE) text/rtmp020.txt

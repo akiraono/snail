@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import sqlite3
+from cyrillic import CyrillicDB
 
 class Cyrillic:
     def __init__(self, cyrillic):
@@ -191,6 +192,7 @@ class Chapter:
 
 
 def main():
+    db = CyrillicDB(sys.argv[1])
     sentences = []
     f = open(sys.argv[2])
     for line in f:
