@@ -3,6 +3,8 @@ import sys
 import sqlite3
 from cyrillic import CyrillicDB
 
+db = CyrillicDB.CyrillicDB(sys.argv[1])
+
 class Cyrillic:
     def __init__(self, cyrillic):
         self.cyrillic = cyrillic
@@ -30,6 +32,10 @@ class Cyrillic:
 
 class Word:
     def __init__(self,word):
+        if db.isRegistered(self.lower(word)):
+            self.registered = True
+        else:
+            self.registered = False
         self.word = word
         self.cyrillics = []
         for i in range(len(self.word)):
@@ -41,7 +47,7 @@ class Word:
         w = "".join(str(x) for x in self.cyrillics)
         if not self.isRussian(w):
             return w
-        if self.isDBRegistered(self.lower(w)):
+        if self.registered:
             return w
         return self.makeRed(w)
     def makeRed(self,data):
@@ -59,82 +65,9 @@ class Word:
         lowered = ''.join(result)
         #print(lowered)
         return lowered
-    def isDBRegistered(self,word):
-        conn = sqlite3.connect(sys.argv[1])
-        cursor = conn.cursor()
-        if self.isDBRegisteredNoun(cursor,word):
-            conn.close()
-            return True
-        if self.isDBRegisteredVerb(cursor,word):
-            conn.close()
-            return True
-        if self.isDBRegisteredPrep(cursor,word):
-            conn.close()
-            return True
-        if self.isDBRegisteredConj(cursor,word):
-            conn.close()
-            return True
-        if self.isDBRegisteredAdvb(cursor,word):
-            conn.close()
-            return True
-        conn.close()
-        return False
+    def isRegistered(self):
+        return self.registered
 
-    def isDBRegisteredNoun(self,cursor,word):
-        select_sql = 'select * from {0} where {1}="{13}" or {2}="{13}" or {3}="{13}" or {4}="{13}" or {5}="{13}" or {6}="{13}" or {7}="{13}" or {8}="{13}" or {9}="{13}" or {10}="{13}" or {11}="{13}" or {12}="{13}";'.format('noun','singular_nominative','singular_genitive','singular_dative','singular_accusative','singular_instrumental','singular_locative','plural_nominative','plural_genitive','plural_dative','plural_accusative','plural_instrumental','plural_locative',word)
-        #print(select_sql)
-        try:
-            cursor.execute(select_sql)
-            row = cursor.fetchone()
-        except sqlite3.Error as er:
-            print(er)
-        if row is None:
-            return False
-        return True
-    def isDBRegisteredVerb(self,cursor,word):
-        select_sql = 'select * from {0} where {1}="{14}" or {2}="{14}" or {3}="{14}" or {4}="{14}" or {5}="{14}" or {6}="{14}" or {7}="{14}" or {8}="{14}" or {9}="{14}" or {10}="{14}" or {11}="{14}" or {12}="{14}" or {13}="${14}" ;'.format('verb','infinitive','singular_first','singular_second','singular_third','plural_first','plural_second','plural_third','past_masculine','past_feminine','past_neuter','past_plural','singular_order','plural_order',word)
-        #print(select_sql)
-        try:
-            cursor.execute(select_sql)
-            row = cursor.fetchone()
-        except sqlite3.Error as er:
-            print(er)
-        if row is None:
-            return False
-        return True
-    def isDBRegisteredPrep(self,cursor,word):
-        select_sql = 'select {0} from {1} where {0}="{2}";'.format('preposition','preposition',word)
-        #print(select_sql)
-        try:
-            cursor.execute(select_sql)
-            row = cursor.fetchone()
-        except sqlite3.Error as er:
-            print(er)
-        if row is None:
-            return False
-        return True
-    def isDBRegisteredConj(self,cursor,word):
-        select_sql = 'select {0} from {1} where {0}="{2}";'.format('conjunction','conjunction',word)
-        #print(select_sql)
-        try:
-            cursor.execute(select_sql)
-            row = cursor.fetchone()
-        except sqlite3.Error as er:
-            print(er)
-        if row is None:
-            return False
-        return True
-    def isDBRegisteredAdvb(self,cursor,word):
-        select_sql = 'select {0} from {1} where {0}="{2}";'.format('adverb','adverb',word)
-        #print(select_sql)
-        try:
-            cursor.execute(select_sql)
-            row = cursor.fetchone()
-        except sqlite3.Error as er:
-            print(er)
-        if row is None:
-            return False
-        return True
 
         
 
@@ -161,13 +94,40 @@ class Sentence:
         for c in chunks:
             words.append(Word(c))
         return words
+    def words_count(self):
+        return len(self.words)
+    def registered_word_count(self):
+        count = 0
+        for w in self.words:
+            if w.isRegistered():
+                count += 1
+        return count
 
-class Chapter:
-    def __init__(self,data):
+
+        
+class Text:
+    def __init__(self, filename):
+        self.wholetext = ''
         self.sentences = []
+        f = open(filename)
+        for line in f:
+            self.wholetext += line.rstrip()
+            self.wholetext += ' '
+            #print(self.wholetext)
+        f.close()
+        data = self.wholetext
         while len(data)>0:
             first,data = self.split_by_period(data)
             self.sentences.append(Sentence(first))
+        return
+    def addSentence(self, s):
+        self.sentences.append(s)
+        return
+    def __str__(self):
+        r = ''
+        for s in self.sentences:
+            r += s.__str__()
+        return r
     def split_by_period(self,data):
         index = data.find('.')
         if index >= 0:
@@ -178,8 +138,6 @@ class Chapter:
             return first_half,second_half
         else:
             return data,''
-    def getSentences(self):
-        return self.sentences
     def removeExtraSpace(self,data):
         result = []
         datas = data.strip().split(' ')
@@ -187,22 +145,32 @@ class Chapter:
             if len(d) > 0:
                 result.append(d)
         return ' '.join(result)
-        
-        
+    def words_stat(self):
+        count = 0
+        for s in self.sentences:
+            count += s.words_count()
+        dbcount = 0
+        for s in self.sentences:
+            dbcount += s.registered_word_count()
+        ratio = float(dbcount)/count * 100
+        return str(dbcount) + '/' + str(count) + '(' + str(round(ratio,2)) + '%)'
+
 
 
 def main():
-    db = CyrillicDB(sys.argv[1])
-    sentences = []
-    f = open(sys.argv[2])
-    for line in f:
-        if len(line.rstrip()) == 0: # skip blank line
-            continue
-        chap = Chapter(line.rstrip())
-        sentences.extend(chap.getSentences())
-    f.close()
-    for sentence in sentences:
-        print(sentence)
+    text = Text(sys.argv[2])
+    print(text)
+    print('DB covered words = ',text.words_stat())
+    #sentences = []
+    #f = open(sys.argv[2])
+    # for line in f:
+    #     if len(line.rstrip()) == 0: # skip blank line
+    #         continue
+    #     chap = Chapter(line.rstrip())
+    #     sentences.extend(chap.getSentences())
+    # f.close()
+    # for sentence in sentences:
+    #     print(sentence)
     return
 
 
