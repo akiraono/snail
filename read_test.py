@@ -126,7 +126,7 @@ class Text:
     def __str__(self):
         r = ''
         for s in self.sentences:
-            r += s.__str__()
+            r += s.__str__() + ' '
         return r
     def split_by_period(self,data):
         index = data.find('.')
